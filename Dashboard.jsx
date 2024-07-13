@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Playlists from './Playlists';
+import Player from './Player';
+import Search from './Search';
 
 const Dashboard = () => {
   const [token, setToken] = useState('');
   const [playlists, setPlaylists] = useState([]);
+  const [trackUri, setTrackUri] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get('code');
@@ -38,10 +42,37 @@ const Dashboard = () => {
     }
   }, [token]);
 
+  const handleSearch = (query) => {
+    if (token) {
+      axios.get(`https://api.spotify.com/v1/search?q=${query}&type=track`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }).then(response => {
+        setSearchResults(response.data.tracks.items);
+      }).catch(error => {
+        console.error('Error searching tracks', error);
+      });
+    }
+  };
+
   return (
     <div className="dashboard">
       <h1>Dashboard</h1>
-      <Playlists playlists={playlists} />
+      <Search onSearch={handleSearch} />
+      <Playlists playlists={playlists} setTrackUri={setTrackUri} />
+      <Player token={token} trackUri={trackUri} />
+      <div>
+        <h2>Search Results</h2>
+        <ul>
+          {searchResults.map(track => (
+            <li key={track.id} onClick={() => setTrackUri(track.uri)}>
+              <img src={track.album.images[0].url} alt={track.name} />
+              <p>{track.name} - {track.artists[0].name}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
