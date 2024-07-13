@@ -32,3 +32,22 @@ body {
   height: 50px;
   margin-right: 10px;
 }
+
+.player {
+  margin-top: 20px;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+form input {
+  padding: 10px;
+  font-size: 16px;
+}
+
+form button {
+  padding: 10px;
+  font-size: 16px;
+  margin-left: 10px;
+}
